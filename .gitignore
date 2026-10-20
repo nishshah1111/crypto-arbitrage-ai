@@ -1,0 +1,37 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+env/
+
+# Secrets - never commit real keys
+.env
+.env.*
+!.env.example
+
+# Runtime state (created when the app runs)
+portfolio_state.json
+*.log
+training_log.txt
+
+# Node / React frontend
+node_modules/
+frontend/build/
+npm-debug.log*
+
+# Generated figures
+analysis/paper_figures/
+analysis/figures/
+
+# IDE / OS
+.vscode/
+.idea/
+.claude/
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Note: trained models (models/*.pkl, *.keras) and datasets (data/*.csv)
+# are intentionally committed so the project runs right after cloning.

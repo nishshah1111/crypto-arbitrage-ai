@@ -1,0 +1,991 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🧠 Crypto Arbitrage AI Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .header {
+            background: rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+            padding: 30px 20px;
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .refresh-btn {
+            position: absolute;
+            top: 30px;
+            right: 30px;
+            background: rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .refresh-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .stat-card h3 {
+            font-size: 0.9rem;
+            color: #666;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+        }
+
+        .stat-card .value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .stat-card .subtitle {
+            font-size: 0.85rem;
+            color: #999;
+        }
+
+        .section {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .section h2 {
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+        }
+
+        .opportunities-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 20px;
+        }
+
+        .opportunity-card {
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            padding: 20px;
+        }
+
+        .opportunity-card h3 {
+            margin-bottom: 15px;
+            font-size: 1.3rem;
+        }
+
+        .opp-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .profit {
+            color: #10b981;
+            font-weight: 700;
+        }
+
+        .price-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
+        }
+
+        .price-card {
+            border: 1px solid #e0e0e0;
+            border-radius: 10px;
+            padding: 20px;
+        }
+
+        .price-card h3 {
+            text-align: center;
+            margin-bottom: 15px;
+        }
+
+        .price-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px;
+            background: #f9f9f9;
+            border-radius: 6px;
+            margin-bottom: 8px;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 60px 20px;
+            color: white;
+            font-size: 1.2rem;
+        }
+
+        .no-data {
+            text-align: center;
+            padding: 60px 20px;
+            color: #999;
+        }
+
+        .badge {
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .badge.success {
+            background: #10b981;
+            color: white;
+        }
+
+        .execute-btn {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .execute-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .execute-btn:disabled {
+            background: #9ca3af;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .trade-amount-input {
+            width: 100%;
+            padding: 8px 12px;
+            margin: 8px 0;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 6px;
+            background: rgba(0, 0, 0, 0.3);
+            color: white;
+            font-size: 0.9rem;
+            transition: border-color 0.3s ease;
+        }
+
+        .trade-amount-input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .trade-history-table {
+            width: 100%;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .trade-history-table table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .trade-history-table th {
+            background: rgba(102, 126, 234, 0.3);
+            padding: 12px;
+            text-align: left;
+            font-weight: 600;
+            border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .trade-history-table td {
+            padding: 10px 12px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .trade-history-table tr:hover {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .profit-positive {
+            color: #10b981;
+            font-weight: 600;
+        }
+
+        .profit-negative {
+            color: #ef4444;
+            font-weight: 600;
+        }
+
+        .trade-badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .trade-badge.success {
+            background: rgba(16, 185, 129, 0.2);
+            color: #10b981;
+        }
+
+        .trade-badge.failed {
+            background: rgba(239, 68, 68, 0.2);
+            color: #ef4444;
+        }
+
+        .trade-badge.expired {
+            background: rgba(251, 191, 36, 0.2);
+            color: #f59e0b;
+        }
+
+        .trade-badge.insufficient {
+            background: rgba(107, 114, 128, 0.2);
+            color: #6b7280;
+        }
+
+        .footer {
+            background: rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+            color: white;
+            text-align: center;
+            padding: 30px;
+            margin-top: 40px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🧠 Crypto Arbitrage AI</h1>
+        <p>Real-time Arbitrage Detection Using Agentic AI</p>
+        <button class="refresh-btn" onclick="loadData()">🔄 Refresh</button>
+    </div>
+
+    <div class="container">
+        <!-- Stats Cards -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <h3>💰 Portfolio Value</h3>
+                <div class="value" id="portfolio-value">Loading...</div>
+                <div class="subtitle" id="roi">ROI: -</div>
+            </div>
+            <div class="stat-card">
+                <h3>📊 Total Trades</h3>
+                <div class="value" id="total-trades">0</div>
+                <div class="subtitle" id="success-rate">Success Rate: 0%</div>
+            </div>
+            <div class="stat-card">
+                <h3>🎯 Opportunities</h3>
+                <div class="value" id="opp-count">0</div>
+                <div class="subtitle">Active now</div>
+            </div>
+            <div class="stat-card">
+                <h3>⏰ Last Update</h3>
+                <div class="value" id="last-update" style="font-size: 1.2rem;">-</div>
+                <div class="subtitle" id="last-date">-</div>
+            </div>
+        </div>
+
+        <!-- Opportunities Section -->
+        <div class="section">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                <h2 style="margin: 0;">🎯 Active Opportunities</h2>
+                <div style="display: flex; gap: 10px; align-items: center;">
+                    <label style="font-size: 0.9rem; color: #666;">
+                        <input type="checkbox" id="ml-only-filter" style="margin-right: 5px;">
+                        Only show ML models (BTC/USDT, ETH/USDT)
+                    </label>
+                </div>
+            </div>
+            <div id="opportunities" class="opportunities-grid">
+                <div class="loading">Loading opportunities...</div>
+            </div>
+        </div>
+
+        <!-- Trade History Section -->
+        <div class="section">
+            <h2>📜 Recent Trades</h2>
+            <div id="trade-history">
+                <div class="loading">Loading trade history...</div>
+            </div>
+        </div>
+
+        <!-- Closed Opportunities Section -->
+        <div class="section">
+            <h2>🔒 Closed Opportunities</h2>
+            <div style="margin-bottom: 15px;">
+                <label for="status-filter">Filter by Status: </label>
+                <select id="status-filter" onchange="filterClosedOpportunities()" style="padding: 5px; border-radius: 5px; border: 1px solid #ddd;">
+                    <option value="all">All</option>
+                    <option value="executed">Executed</option>
+                    <option value="failed">Failed</option>
+                    <option value="expired">Expired</option>
+                </select>
+            </div>
+            <div id="closed-opportunities-stats" style="margin-bottom: 15px; padding: 10px; background: #f8f9fa; border-radius: 8px;">
+                <div class="loading">Loading statistics...</div>
+            </div>
+            <div id="closed-opportunities">
+                <div class="loading">Loading closed opportunities...</div>
+            </div>
+        </div>
+
+        <!-- Prices Section -->
+        <div class="section">
+            <h2>📊 Real-Time Prices</h2>
+            <div id="prices" class="price-grid">
+                <div class="loading">Loading prices...</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="footer">
+        <p>Built with HTML/CSS/JS + FastAPI • Agentic AI System</p>
+        <p>© 2025 Crypto Arbitrage AI</p>
+    </div>
+
+    <script>
+        const API_URL = 'http://localhost:8000';
+
+        // Load all data
+        async function loadData() {
+            try {
+                console.log('Loading data from API...');
+                
+                // Fetch stats
+                const statsRes = await fetch(`${API_URL}/api/stats`);
+                if (!statsRes.ok) throw new Error(`Stats API error: ${statsRes.status}`);
+                const stats = await statsRes.json();
+                console.log('Stats loaded:', stats);
+                
+                document.getElementById('portfolio-value').textContent = `$${stats.portfolio_value.toFixed(2)}`;
+                document.getElementById('roi').textContent = `ROI: ${stats.roi.toFixed(2)}%`;
+                document.getElementById('total-trades').textContent = stats.total_trades;
+                document.getElementById('success-rate').textContent = `Success Rate: ${stats.success_rate.toFixed(1)}%`;
+
+                // Fetch opportunities
+                const oppRes = await fetch(`${API_URL}/api/opportunities`);
+                if (!oppRes.ok) throw new Error(`Opportunities API error: ${oppRes.status}`);
+                const opps = await oppRes.json();
+                
+                // Pairs with trained ML models
+                const ML_PAIRS = ['BTC/USDT', 'ETH/USDT'];
+                
+                // Check if ML-only filter is active
+                const mlOnlyFilter = document.getElementById('ml-only-filter')?.checked || false;
+                
+                // Filter opportunities
+                const validOpps = opps.opportunities ? opps.opportunities.filter(opp => {
+                    // Basic validation
+                    if (!opp.opportunity || opp.opportunity.net_spread_pct == null) return false;
+                    if (opp.opportunity.net_spread_pct >= 10) return false; // Filter out >10% spreads (bad data)
+                    
+                    // Apply ML-only filter if enabled
+                    if (mlOnlyFilter && !ML_PAIRS.includes(opp.pair)) return false;
+                    
+                    return true;
+                }) : [];
+                
+                // Count ML vs Heuristic opportunities (before filter)
+                const allValidOpps = opps.opportunities ? opps.opportunities.filter(opp => 
+                    opp.opportunity && opp.opportunity.net_spread_pct != null && opp.opportunity.net_spread_pct < 10
+                ) : [];
+                const mlOpps = allValidOpps.filter(opp => ML_PAIRS.includes(opp.pair));
+                const heuristicOpps = allValidOpps.filter(opp => !ML_PAIRS.includes(opp.pair));
+                
+                console.log('Opportunities loaded:', allValidOpps.length, 'total valid');
+                console.log(`  - ML Model pairs: ${mlOpps.length} (BTC/USDT, ETH/USDT)`);
+                console.log(`  - Heuristic pairs: ${heuristicOpps.length} (other pairs)`);
+                console.log(`  - Showing: ${validOpps.length} (filter: ${mlOnlyFilter ? 'ML only' : 'all'})`);
+                
+                document.getElementById('opp-count').textContent = validOpps.length;
+                
+                // Display opportunities
+                const oppContainer = document.getElementById('opportunities');
+                if (validOpps.length === 0) {
+                    oppContainer.innerHTML = `
+                        <div class="no-data">
+                            <p>No arbitrage opportunities detected</p>
+                            <small>Market is efficient right now. Opportunities will appear during volatility.</small>
+                        </div>
+                    `;
+                } else {
+                    oppContainer.innerHTML = validOpps.map((opp, index) => {
+                        const baseCurrency = opp.pair.split('/')[0];
+                        const defaultAmountUSD = 25; // Default $25 trade
+                        const defaultAmountCrypto = defaultAmountUSD / opp.opportunity.buy_price;
+                        const estimatedProfit = (opp.opportunity.net_spread_pct * 0.01 * defaultAmountUSD);
+                        
+                        // Extract AI insights
+                        const prediction = opp.prediction || {};
+                        const decision = opp.decision || {};
+                        const confidence = (prediction.confidence * 100) || 0;
+                        const aiAction = decision.action || 'UNKNOWN';
+                        const aiReason = decision.reason || 'No reasoning available';
+                        const modelUsed = prediction.model_type || prediction.model_used || 'Heuristic';
+                        const riskLevel = decision.risk_assessment?.risk_level || 'UNKNOWN';
+                        const individualModels = prediction.individual_models || [];
+                        
+                        // Check if this pair has real ML models (BTC/USDT or ETH/USDT only)
+                        const isMLModel = ML_PAIRS.includes(opp.pair);
+                        const mlBadge = isMLModel 
+                            ? '<span style="background: #10b981; color: white; padding: 2px 6px; border-radius: 4px; font-size: 0.7rem; font-weight: 600;">ML MODEL</span>' 
+                            : '<span style="background: #f59e0b; color: white; padding: 2px 6px; border-radius: 4px; font-size: 0.7rem; font-weight: 600;">HEURISTIC</span>';
+                        
+                        // Color coding for confidence
+                        let confidenceColor = '#666';
+                        if (confidence >= 75) confidenceColor = '#10b981';
+                        else if (confidence >= 50) confidenceColor = '#f59e0b';
+                        else confidenceColor = '#ef4444';
+                        
+                        // Color coding for action
+                        let actionColor = aiAction === 'EXECUTE' ? '#10b981' : '#666';
+                        let actionIcon = aiAction === 'EXECUTE' ? '✅' : '⏸️';
+                        
+                        // Build individual model breakdown HTML
+                        let modelBreakdown = '';
+                        if (individualModels.length > 0 && isMLModel) {
+                            modelBreakdown = `
+                                <div style="margin-top: 8px; padding-top: 8px; border-top: 1px solid rgba(0,0,0,0.1);">
+                                    <div style="font-size: 0.8rem; color: #666; margin-bottom: 4px;">Individual ML Models:</div>
+                                    ${individualModels.map(m => {
+                                        const modelConf = (m.confidence * 100).toFixed(1);
+                                        const modelType = (m.model_type || 'N/A').toUpperCase();
+                                        const modelIcon = m.predicted ? '✓' : '✗';
+                                        const modelColor = m.predicted ? '#10b981' : '#ef4444';
+                                        return `<div style="font-size: 0.75rem; color: #666; margin: 2px 0;">
+                                            <span style="color: ${modelColor};">${modelIcon}</span> ${modelType}: ${modelConf}%
+                                        </div>`;
+                                    }).join('')}
+                                </div>
+                            `;
+                        } else if (!isMLModel) {
+                            modelBreakdown = `
+                                <div style="margin-top: 8px; padding-top: 8px; border-top: 1px solid rgba(0,0,0,0.1);">
+                                    <div style="font-size: 0.75rem; color: #f59e0b; font-style: italic;">
+                                        ⚠️ No trained ML model for ${opp.pair}. Using rule-based heuristics.
+                                    </div>
+                                </div>
+                            `;
+                        }
+                        
+                        return `
+                        <div class="opportunity-card">
+                            <h3>${opp.pair}</h3>
+                            <div class="opp-row">
+                                <span>Buy:</span>
+                                <span>${opp.opportunity.buy_exchange} @ $${opp.opportunity.buy_price.toFixed(2)}</span>
+                            </div>
+                            <div class="opp-row">
+                                <span>Sell:</span>
+                                <span>${opp.opportunity.sell_exchange} @ $${opp.opportunity.sell_price.toFixed(2)}</span>
+                            </div>
+                            <div class="opp-row">
+                                <span>Net Spread:</span>
+                                <span class="profit">${opp.opportunity.net_spread_pct.toFixed(3)}%</span>
+                            </div>
+                            
+                            <!-- AI Insights Section -->
+                            <div style="margin: 15px 0; padding: 12px; background: rgba(0,0,0,0.05); border-radius: 8px; border-left: 3px solid ${actionColor};">
+                                <div style="font-weight: 600; font-size: 0.9rem; margin-bottom: 8px; color: #333; display: flex; align-items: center; gap: 8px;">
+                                    🤖 AI Decision: <span style="color: ${actionColor};">${actionIcon} ${aiAction}</span>
+                                    ${mlBadge}
+                                </div>
+                                <div style="font-size: 0.85rem; margin-bottom: 6px;">
+                                    <span style="color: #666;">Confidence:</span> 
+                                    <span style="color: ${confidenceColor}; font-weight: 600;">${confidence.toFixed(1)}%</span>
+                                    <span style="margin-left: 10px; color: #666;">Risk:</span> 
+                                    <span style="font-weight: 500; color: ${riskLevel === 'LOW' ? '#10b981' : riskLevel === 'MEDIUM' ? '#f59e0b' : '#ef4444'};">${riskLevel}</span>
+                                </div>
+                                <div style="font-size: 0.8rem; color: #666; font-style: italic; margin-top: 6px;">
+                                    "${aiReason}"
+                                </div>
+                                ${modelBreakdown}
+                            </div>
+                            
+                            <div class="opp-row" style="margin-top: 10px;">
+                                <label style="font-size: 0.85rem; opacity: 0.8;">Trade Amount (USD):</label>
+                                <input type="number" class="trade-amount-input" id="amount-usd-${index}" 
+                                       value="${defaultAmountUSD}" step="10" min="1"
+                                       placeholder="Enter USD amount (e.g., 25)">
+                            </div>
+                            <div class="opp-row" style="font-size: 0.85rem; opacity: 0.7;">
+                                <span>≈ <span id="crypto-amount-${index}">${defaultAmountCrypto.toFixed(6)}</span> ${baseCurrency}</span>
+                            </div>
+                            <div class="opp-row">
+                                <span>Est. Profit:</span>
+                                <span class="profit" id="profit-${index}">$${estimatedProfit.toFixed(2)}</span>
+                            </div>
+                            <div class="opp-row" style="margin-top: 10px;">
+                                <button class="execute-btn" onclick="executeTrade(${index}, '${opp.pair}')" id="exec-btn-${index}">
+                                    🚀 Execute Paper Trade
+                                </button>
+                            </div>
+                        </div>
+                    `}).join('');
+                    
+                    // Store opportunities globally for execution
+                    window.currentOpportunities = validOpps;
+                    
+                    // Add input listeners to update profit estimate
+                    validOpps.forEach((opp, index) => {
+                        const amountInput = document.getElementById(`amount-usd-${index}`);
+                        if (amountInput) {
+                            amountInput.addEventListener('input', (e) => {
+                                const amountUSD = parseFloat(e.target.value) || 25;
+                                const buyPrice = opp.opportunity.buy_price;
+                                const cryptoAmount = amountUSD / buyPrice;
+                                const estProfit = (opp.opportunity.net_spread_pct * 0.01 * amountUSD);
+                                
+                                document.getElementById(`crypto-amount-${index}`).textContent = cryptoAmount.toFixed(6);
+                                document.getElementById(`profit-${index}`).textContent = `$${estProfit.toFixed(2)}`;
+                            });
+                        }
+                    });
+                }
+
+                // Fetch prices
+                const pricesRes = await fetch(`${API_URL}/api/prices/all`);
+                if (!pricesRes.ok) {
+                    console.error('Prices API error:', pricesRes.status);
+                    document.getElementById('prices').innerHTML = '<div class="no-data"><p>Error loading prices</p></div>';
+                    throw new Error(`Prices API error: ${pricesRes.status}`);
+                }
+                const prices = await pricesRes.json();
+                console.log('Prices loaded:', Object.keys(prices.data).length, 'pairs');
+                console.log('Sample data:', prices.data);
+
+                const priceContainer = document.getElementById('prices');
+                const priceCards = Object.entries(prices.data).map(([pair, priceData]) => {
+                    // Skip if no data
+                    if (!priceData || priceData.length === 0) {
+                        console.log(`No data for ${pair}`);
+                        return '';
+                    }
+                    
+                    // Filter out null/invalid prices but be more lenient
+                    const validPrices = priceData.filter(p => {
+                        const isValid = p && p.price != null && typeof p.price === 'number' && !isNaN(p.price) && isFinite(p.price);
+                        if (!isValid) console.log(`Invalid price for ${pair}:`, p);
+                        return isValid;
+                    });
+                    
+                    if (validPrices.length === 0) {
+                        console.log(`No valid prices for ${pair}`);
+                        return '';
+                    }
+                    
+                    const minPrice = Math.min(...validPrices.map(p => p.price));
+                    const maxPrice = Math.max(...validPrices.map(p => p.price));
+                    const spread = ((maxPrice - minPrice) / minPrice * 100).toFixed(3);
+                    
+                    return `
+                        <div class="price-card">
+                            <h3>${pair}</h3>
+                            ${validPrices.map(p => `
+                                <div class="price-row">
+                                    <span><strong>${p.exchange}</strong></span>
+                                    <span>$${p.price.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</span>
+                                </div>
+                            `).join('')}
+                            <div class="opp-row">
+                                <span>Spread:</span>
+                                <span>${spread}%</span>
+                            </div>
+                        </div>
+                    `;
+                }).filter(card => card !== '').join('');
+                
+                if (priceCards) {
+                    priceContainer.innerHTML = priceCards;
+                } else {
+                    priceContainer.innerHTML = '<div class="no-data"><p>No price data available</p></div>';
+                }
+
+                // Update timestamp
+                const now = new Date();
+                document.getElementById('last-update').textContent = now.toLocaleTimeString();
+                document.getElementById('last-date').textContent = now.toLocaleDateString();
+                
+                // Load trade history
+                await loadTradeHistory();
+                
+                console.log('✅ Data loaded successfully!');
+
+            } catch (error) {
+                console.error('❌ Error loading data:', error);
+                console.error('Error details:', error.message);
+                alert(`Error connecting to API: ${error.message}\n\nMake sure the backend is running on http://localhost:8000`);
+            }
+        }
+
+        // Execute a paper trade
+        async function executeTrade(index, pair) {
+            const opportunity = window.currentOpportunities[index];
+            const btn = document.getElementById(`exec-btn-${index}`);
+            const amountInputUSD = document.getElementById(`amount-usd-${index}`);
+            const amountUSD = parseFloat(amountInputUSD?.value) || 25;
+            
+            if (!opportunity) {
+                alert('Opportunity not found!');
+                return;
+            }
+            
+            // Get current portfolio value for validation
+            const portfolioValueText = document.getElementById('portfolio-value').textContent;
+            const portfolioValue = parseFloat(portfolioValueText.replace('$', '').replace(',', ''));
+            const buyPrice = opportunity.opportunity.buy_price;
+            
+            // Convert USD to crypto amount
+            const positionSize = amountUSD / buyPrice;
+            const maxAffordableUSD = portfolioValue / 1.002; // Account for fees
+            
+            if (amountUSD <= 0) {
+                alert('Please enter a positive trade amount');
+                return;
+            }
+            
+            if (amountUSD * 1.002 > portfolioValue) {
+                alert(`Insufficient funds! Maximum you can trade: $${maxAffordableUSD.toFixed(2)}\n\nYour portfolio: $${portfolioValue.toFixed(2)}\nRequested: $${amountUSD.toFixed(2)} (+ fees)`);
+                return;
+            }
+            
+            // Disable button
+            btn.disabled = true;
+            btn.textContent = '⏳ Executing...';
+            
+            try {
+                const response = await fetch(`${API_URL}/api/execute-trade`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        pair: pair,
+                        opportunity: opportunity.opportunity,
+                        position_size: positionSize
+                    })
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    // Show success message with proper line breaks
+                    const message = [
+                        '✅ Trade Executed Successfully!',
+                        '',
+                        `Pair: ${pair}`,
+                        `Amount: $${amountUSD.toFixed(2)} (${positionSize.toFixed(6)} ${pair.split('/')[0]})`,
+                        `Profit: $${result.trade.net_profit.toFixed(2)}`,
+                        `ROI: ${result.trade.roi_pct.toFixed(3)}%`,
+                        '',
+                        `New Portfolio Value: $${result.stats.portfolio_value.toFixed(2)}`
+                    ].join('\n');
+                    
+                    alert(message);
+                    
+                    // Update stats immediately
+                    document.getElementById('portfolio-value').textContent = `$${result.stats.portfolio_value.toFixed(2)}`;
+                    document.getElementById('total-trades').textContent = result.stats.total_trades;
+                    document.getElementById('success-rate').textContent = `Success Rate: ${(result.stats.successful_trades / result.stats.total_trades * 100).toFixed(1)}%`;
+                    
+                    // Reload trade history immediately (no delay)
+                    loadTradeHistory();
+                    
+                    // Reload closed opportunities immediately
+                    loadClosedOpportunities();
+                    
+                    // Reload full data to refresh everything else
+                    setTimeout(() => loadData(), 500);
+                } else {
+                    alert(`❌ Trade Failed:\n\n${result.message}`);
+                    btn.disabled = false;
+                    btn.textContent = '🚀 Execute Paper Trade';
+                }
+            } catch (error) {
+                console.error('Error executing trade:', error);
+                alert(`Error executing trade: ${error.message}`);
+                btn.disabled = false;
+                btn.textContent = '🚀 Execute Paper Trade';
+            }
+        }
+
+        // Load trade history
+        async function loadTradeHistory() {
+            try {
+                const response = await fetch(`${API_URL}/api/trades`);
+                if (!response.ok) {
+                    throw new Error(`Trade history API error: ${response.status}`);
+                }
+                const data = await response.json();
+                const trades = data.trades || [];
+                
+                const historyContainer = document.getElementById('trade-history');
+                
+                if (trades.length === 0) {
+                    historyContainer.innerHTML = `
+                        <div class="no-data">
+                            <p>No trades executed yet</p>
+                            <small>Your trade history will appear here after you execute your first paper trade.</small>
+                        </div>
+                    `;
+                    return;
+                }
+                
+                // Show last 20 trades
+                const recentTrades = trades.slice(-20).reverse();
+                
+                historyContainer.innerHTML = `
+                    <div class="trade-history-table">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Time</th>
+                                    <th>Pair</th>
+                                    <th>Buy From</th>
+                                    <th>Sell To</th>
+                                    <th>Amount</th>
+                                    <th>P&L</th>
+                                    <th>ROI</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${recentTrades.map(trade => {
+                                    const timestamp = new Date(trade.timestamp);
+                                    const isProfit = trade.net_profit >= 0;
+                                    const profitClass = isProfit ? 'profit-positive' : 'profit-negative';
+                                    const statusBadge = trade.success ? 'success' : 'failed';
+                                    const dateTimeStr = timestamp.toLocaleString('en-US', { 
+                                        month: '2-digit', 
+                                        day: '2-digit', 
+                                        year: 'numeric', 
+                                        hour: '2-digit', 
+                                        minute: '2-digit', 
+                                        second: '2-digit' 
+                                    });
+                                    
+                                    return `
+                                        <tr>
+                                            <td>${dateTimeStr}</td>
+                                            <td><strong>${trade.pair}</strong></td>
+                                            <td>${trade.buy_exchange}</td>
+                                            <td>${trade.sell_exchange}</td>
+                                            <td>${trade.position_size.toFixed(4)}</td>
+                                            <td class="${profitClass}">${isProfit ? '+' : ''}$${trade.net_profit.toFixed(2)}</td>
+                                            <td class="${profitClass}">${isProfit ? '+' : ''}${trade.roi_pct.toFixed(3)}%</td>
+                                            <td><span class="trade-badge ${statusBadge}">${trade.success ? 'Success' : 'Failed'}</span></td>
+                                        </tr>
+                                    `;
+                                }).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+                `;
+                
+            } catch (error) {
+                console.error('Error loading trade history:', error);
+                document.getElementById('trade-history').innerHTML = `
+                    <div class="no-data">
+                        <p>Error loading trade history</p>
+                        <small>${error.message}</small>
+                    </div>
+                `;
+            }
+        }
+
+        // Load closed opportunities
+        let allClosedOpportunities = [];
+        
+        async function loadClosedOpportunities() {
+            try {
+                const response = await fetch(`${API_URL}/api/closed-opportunities`);
+                if (!response.ok) {
+                    throw new Error(`Closed opportunities API error: ${response.status}`);
+                }
+                const data = await response.json();
+                allClosedOpportunities = data.opportunities || [];
+                
+                // Update stats
+                const stats = data.stats || {};
+                const statsContainer = document.getElementById('closed-opportunities-stats');
+                statsContainer.innerHTML = `
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; font-size: 14px;">
+                        <div><strong>Total:</strong> ${stats.total || 0}</div>
+                        <div><strong>Executed:</strong> <span style="color: #10b981">${stats.executed || 0}</span></div>
+                        <div><strong>Failed:</strong> <span style="color: #ef4444">${stats.failed || 0}</span></div>
+                        <div><strong>Expired:</strong> <span style="color: #f59e0b">${stats.expired || 0}</span></div>
+                        <div><strong>Capture Rate:</strong> <span style="color: #3b82f6; font-weight: bold">${(stats.capture_rate || 0).toFixed(1)}%</span></div>
+                    </div>
+                `;
+                
+                // Display opportunities
+                filterClosedOpportunities();
+                
+            } catch (error) {
+                console.error('Error loading closed opportunities:', error);
+                document.getElementById('closed-opportunities').innerHTML = `
+                    <div class="no-data">
+                        <p>Error loading closed opportunities</p>
+                        <small>${error.message}</small>
+                    </div>
+                `;
+            }
+        }
+
+        function filterClosedOpportunities() {
+            const filter = document.getElementById('status-filter').value;
+            const container = document.getElementById('closed-opportunities');
+            
+            let filtered = allClosedOpportunities;
+            if (filter !== 'all') {
+                filtered = allClosedOpportunities.filter(opp => opp.status === filter);
+            }
+            
+            if (filtered.length === 0) {
+                container.innerHTML = `
+                    <div class="no-data">
+                        <p>No closed opportunities found</p>
+                        <small>${filter === 'all' ? 'Opportunities will appear here after you execute trades.' : `No opportunities with status: ${filter}`}</small>
+                    </div>
+                `;
+                return;
+            }
+            
+            // Show last 50 opportunities
+            const recent = filtered.slice(-50).reverse();
+            
+            container.innerHTML = `
+                <div class="trade-history-table">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Time</th>
+                                <th>Pair</th>
+                                <th>Buy From</th>
+                                <th>Sell To</th>
+                                <th>Spread</th>
+                                <th>Status</th>
+                                <th>Reason</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${recent.map(opp => {
+                                const timestamp = new Date(opp.closed_at);
+                                let statusClass = '';
+                                let statusText = '';
+                                
+                                switch(opp.status) {
+                                    case 'executed':
+                                        statusClass = 'success';
+                                        statusText = '✓ Executed';
+                                        break;
+                                    case 'failed':
+                                        statusClass = 'failed';
+                                        statusText = '✗ Failed';
+                                        break;
+                                    case 'expired':
+                                        statusClass = 'expired';
+                                        statusText = '⏱ Expired';
+                                        break;
+                                    default:
+                                        statusClass = 'failed';
+                                        statusText = '? Unknown';
+                                }
+                                
+                                const dateTimeStr = timestamp.toLocaleString('en-US', { 
+                                    month: '2-digit', 
+                                    day: '2-digit', 
+                                    year: 'numeric', 
+                                    hour: '2-digit', 
+                                    minute: '2-digit', 
+                                    second: '2-digit' 
+                                });
+                                
+                                return `
+                                    <tr>
+                                        <td>${dateTimeStr}</td>
+                                        <td><strong>${opp.pair}</strong></td>
+                                        <td>${opp.buy_exchange}</td>
+                                        <td>${opp.sell_exchange}</td>
+                                        <td>${opp.spread_pct ? opp.spread_pct.toFixed(3) : 'N/A'}%</td>
+                                        <td><span class="trade-badge ${statusClass}">${statusText}</span></td>
+                                        <td style="font-size: 12px; max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="${opp.reason || 'N/A'}">${opp.reason || 'N/A'}</td>
+                                    </tr>
+                                `;
+                            }).join('')}
+                        </tbody>
+                    </table>
+                </div>
+            `;
+        }
+
+        // Load data on page load
+        loadData();
+        loadClosedOpportunities();
+
+        // Add event listener for ML-only filter
+        document.getElementById('ml-only-filter')?.addEventListener('change', () => {
+            console.log('ML filter toggled:', document.getElementById('ml-only-filter').checked);
+            loadData(); // Reload with new filter
+        });
+
+        // Auto-refresh every 30 seconds
+        setInterval(() => {
+            loadData();
+            loadClosedOpportunities();
+        }, 30000);
+    </script>
+</body>
+</html>
