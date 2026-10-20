@@ -22,7 +22,7 @@ from agents.analysis import AnalysisAgent
 from agents.prediction import PredictionAgent
 from agents.decision import DecisionAgent
 from agents.execution import ExecutionAgent
-from config import EXCHANGES, PAIRS
+from config import EXCHANGES, PAIRS, _env
 
 # LangChain imports (optional - gracefully degrade if not available)
 try:
@@ -392,7 +392,7 @@ def main():
 """)
     
     # Check for OpenAI API key
-    api_key = os.getenv('OPENAI_API_KEY')
+    api_key = _env('OPENAI_API_KEY') or None
     
     # Initialize orchestrator
     orchestrator = AdvancedAgenticOrchestrator(

@@ -10,15 +10,22 @@ try:
 except ImportError:
     pass
 
+
+def _env(name):
+    """Read a key from the environment, ignoring empty or placeholder values."""
+    value = os.getenv(name, '').strip()
+    return '' if value.startswith('your_') else value
+
+
 EXCHANGES = {
-    'binance': {'name': 'binance', 'apiKey': os.getenv('BINANCE_API_KEY', ''), 'secret': os.getenv('BINANCE_SECRET', '')},
-    'coinbase': {'name': 'coinbase', 'apiKey': os.getenv('COINBASE_API_KEY', ''), 'secret': os.getenv('COINBASE_SECRET', '')},
-    'kraken': {'name': 'kraken', 'apiKey': os.getenv('KRAKEN_API_KEY', ''), 'secret': os.getenv('KRAKEN_SECRET', '')},
-    'cryptocompare': {'name': 'cryptocompare', 'apiKey': os.getenv('CRYPTOCOMPARE_API_KEY', ''), 'secret': ''}
+    'binance': {'name': 'binance', 'apiKey': _env('BINANCE_API_KEY'), 'secret': _env('BINANCE_SECRET')},
+    'coinbase': {'name': 'coinbase', 'apiKey': _env('COINBASE_API_KEY'), 'secret': _env('COINBASE_SECRET')},
+    'kraken': {'name': 'kraken', 'apiKey': _env('KRAKEN_API_KEY'), 'secret': _env('KRAKEN_SECRET')},
+    'cryptocompare': {'name': 'cryptocompare', 'apiKey': _env('CRYPTOCOMPARE_API_KEY'), 'secret': ''}
 }
 API_KEYS = {
-    'coinmarketcap': os.getenv('COINMARKETCAP_API_KEY', ''),
-    'cryptocompare': os.getenv('CRYPTOCOMPARE_API_KEY', '')
+    'coinmarketcap': _env('COINMARKETCAP_API_KEY'),
+    'cryptocompare': _env('CRYPTOCOMPARE_API_KEY')
 }
 
 # Trading pairs to monitor
