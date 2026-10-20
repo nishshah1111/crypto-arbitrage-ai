@@ -1,5 +1,7 @@
 # Crypto Arbitrage AI — Agentic Arbitrage Detection & Prediction
 
+[![License: PolyForm Noncommercial](https://img.shields.io/badge/license-PolyForm%20Noncommercial%201.0.0-blue)](LICENSE.md)
+
 A capstone project that detects and simulates **cross-exchange cryptocurrency arbitrage** in real time, using a team of five cooperating AI agents and machine-learning models (Random Forest, XGBoost, LSTM) trained on historical market data.
 
 > ⚠️ **Educational project. Paper trading only.** No real orders are ever placed. Nothing here is financial advice.
@@ -185,6 +187,18 @@ See [docs/TROUBLESHOOTING.md](docs/TROUBLESHOOTING.md). Common fixes:
 - **Port 8000 in use (Windows):** `netstat -ano | findstr :8000`, then `taskkill /PID <pid> /F`
 - **`ModuleNotFoundError`:** activate the virtual environment and run `pip install -r requirements.txt`
 - **Reset the paper portfolio:** stop the server and delete `portfolio_state.json`
+
+## License
+
+This project is licensed under the [PolyForm Noncommercial License 1.0.0](LICENSE.md).
+
+- ✅ **Free** for personal use, study, research, teaching, and non-profit or educational organisations
+- ✅ You may modify and share it for these purposes, as long as you keep the license and the `Required Notice` line
+- ❌ **Commercial use is not permitted** under this license. That includes selling it, offering it as a paid service, or using it to trade for profit.
+
+### Commercial licensing
+
+If you want to use this project, or work based on it, for any commercial purpose, you need a separate commercial license from the author. Terms (such as a revenue share or a one-time fee) are agreed case by case. Please open an issue on this repository or contact [@nishshah1111](https://github.com/nishshah1111) before any commercial use.
 
 ## Disclaimer
 
