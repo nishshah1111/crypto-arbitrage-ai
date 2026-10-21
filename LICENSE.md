@@ -1,4 +1,4 @@
-Required Notice: Copyright (c) 2025-2026 nishshah1111 (https://github.com/nishshah1111)
+Required Notice: Copyright (c) 2025-2026 nishshah1111 (https://github.com/nishshah1111) and Krutarth0809 (https://github.com/Krutarth0809)
 
 # PolyForm Noncommercial License 1.0.0
 

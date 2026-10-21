@@ -188,6 +188,11 @@ See [docs/TROUBLESHOOTING.md](docs/TROUBLESHOOTING.md). Common fixes:
 - **`ModuleNotFoundError`:** activate the virtual environment and run `pip install -r requirements.txt`
 - **Reset the paper portfolio:** stop the server and delete `portfolio_state.json`
 
+## Authors
+
+- [@nishshah1111](https://github.com/nishshah1111)
+- [@Krutarth0809](https://github.com/Krutarth0809)
+
 ## License
 
 This project is licensed under the [PolyForm Noncommercial License 1.0.0](LICENSE.md).
@@ -198,7 +203,7 @@ This project is licensed under the [PolyForm Noncommercial License 1.0.0](LICENS
 
 ### Commercial licensing
 
-If you want to use this project, or work based on it, for any commercial purpose, you need a separate commercial license from the author. Terms (such as a revenue share or a one-time fee) are agreed case by case. Please open an issue on this repository or contact [@nishshah1111](https://github.com/nishshah1111) before any commercial use.
+If you want to use this project, or work based on it, for any commercial purpose, you need a separate commercial license from the authors. Terms (such as a revenue share or a one-time fee) are agreed case by case. Please open an issue on this repository or contact [@nishshah1111](https://github.com/nishshah1111) or [@Krutarth0809](https://github.com/Krutarth0809) before any commercial use.
 
 ## Disclaimer
 
